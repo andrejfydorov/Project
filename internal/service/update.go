@@ -42,7 +42,7 @@ func (s *Service) Update(writer http.ResponseWriter, request *http.Request) {
 
 		s.repo.Cities[idInt].Population = p.Population
 
-		s.repo.Close()
+		//s.repo.Close()
 
 		writer.WriteHeader(http.StatusOK)
 		writer.Write([]byte(fmt.Sprintf("Город %s успешно обновлен.\n", city.Name)))

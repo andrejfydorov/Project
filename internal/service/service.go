@@ -13,6 +13,7 @@ type Service struct {
 }
 
 func New(r *repo.Repo) error {
+
 	s := Service{repo: r}
 
 	router := chi.NewRouter()
