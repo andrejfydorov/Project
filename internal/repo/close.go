@@ -22,7 +22,7 @@ func Close(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *Repo) {
 
 	writer := bufio.NewWriter(file)
 
-	for _, city := range _repo.Cities {
+	for _, city := range _repo.сities {
 		cityFull := fmt.Sprintf("%d,%s,%s,%s,%d,%d", city.Id, city.Name, city.Region, city.District, city.Population, city.Foundation)
 
 		_, err := writer.WriteString(cityFull)

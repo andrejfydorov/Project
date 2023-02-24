@@ -1,9 +1,9 @@
 package repo
 
 func (r *Repo) Delete(id int) bool {
-	_, ok := r.Cities[id]
+	_, ok := r.сities[id]
 	if ok {
-		delete(r.Cities, id)
+		delete(r.сities, id)
 		return true
 	}
 	return false

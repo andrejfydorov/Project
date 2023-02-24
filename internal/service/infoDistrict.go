@@ -40,7 +40,7 @@ func InfoDistrict(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.
 			}
 
 			var cities []*repo.City
-			for _, city := range _repo.Cities {
+			for _, city := range _repo.GetAll() {
 				if strings.ToUpper(city.District) == strings.ToUpper(d.District) {
 					cities = append(cities, city)
 				}
@@ -62,6 +62,7 @@ func InfoDistrict(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.
 				writer.Write([]byte(fmt.Sprintf("Города в округе %s не найдены.\n", d.District)))
 				return
 			}
+
 			writer.WriteHeader(http.StatusBadRequest)
 		}()
 	}

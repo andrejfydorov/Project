@@ -11,7 +11,7 @@ import (
 
 func New() *Repo {
 
-	repo := Repo{Cities: map[int]*City{}}
+	repo := Repo{сities: map[int]*City{}}
 
 	file, err := os.Open("resources/cities.csv")
 	if err != nil {
@@ -34,8 +34,6 @@ func New() *Repo {
 
 		str := strings.Split(line, ",")
 
-		//fmt.Print(line)
-
 		var c City
 		key, err := strconv.Atoi(str[0])
 		if err != nil {
@@ -57,12 +55,8 @@ func New() *Repo {
 		}
 		c.Foundation = i
 
-		repo.Cities[key] = &c
+		repo.сities[key] = &c
 	}
-
-	//for i, i2 := range repo.Cities {
-	//	fmt.Println(i, i2)
-	//}
 
 	return &repo
 }

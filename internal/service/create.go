@@ -34,13 +34,13 @@ func Create(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Handle
 					return
 				}
 
-				_, ok := _repo.Cities[c.Id]
+				ok := _repo.IsExist(c.Id)
 				if ok {
 					writer.WriteHeader(http.StatusBadRequest)
 					writer.Write([]byte(fmt.Sprintf("Город с id %d уже существует.\n", c.Id)))
 					return
 				}
-				_repo.Cities[c.Id] = &c
+				_repo.Add(&c)
 
 				writer.WriteHeader(http.StatusCreated)
 				writer.Write([]byte(fmt.Sprintf("Город %s успешно был создан\n", c.Name)))

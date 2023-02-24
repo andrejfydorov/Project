@@ -26,8 +26,8 @@ func Info(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.HandlerF
 				log.Fatalln(err)
 			}
 
-			city, ok := _repo.Cities[idInt]
-			if ok {
+			city := _repo.Get(idInt)
+			if city != nil {
 				js, err := json.Marshal(city)
 				if err != nil {
 					writer.WriteHeader(http.StatusInternalServerError)
@@ -43,7 +43,6 @@ func Info(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.HandlerF
 				writer.Write([]byte(fmt.Sprintf("Город с id %d не найден.\n", idInt)))
 				return
 			}
-			writer.WriteHeader(http.StatusBadRequest)
 		}()
 	}
 }

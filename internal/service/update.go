@@ -35,8 +35,8 @@ func Update(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Handle
 				log.Fatalln(err)
 			}
 
-			city, ok := _repo.Cities[idInt]
-			if ok {
+			city := _repo.Get(idInt)
+			if city != nil {
 				type Population struct {
 					Population int `json:"population,omitempty"`
 				}
@@ -49,7 +49,8 @@ func Update(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Handle
 					return
 				}
 
-				_repo.Cities[idInt].Population = p.Population
+				city.Population = p.Population
+				_repo.Update(city)
 
 				writer.WriteHeader(http.StatusOK)
 				writer.Write([]byte(fmt.Sprintf("Город %s успешно обновлен.\n", city.Name)))
@@ -59,8 +60,6 @@ func Update(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Handle
 				writer.Write([]byte(fmt.Sprintf("Город с %d не найден.\n", idInt)))
 				return
 			}
-
-			writer.WriteHeader(http.StatusBadRequest)
 		}()
 	}
 }

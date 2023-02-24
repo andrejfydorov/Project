@@ -19,7 +19,7 @@ func Delete(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Handle
 			defer mutex.Unlock()
 
 			id := chi.URLParam(request, "id")
-			//fmt.Println(id + "\n")
+
 			idInt, err := strconv.Atoi(id)
 			if err != nil {
 				log.Fatalln(err)
@@ -34,8 +34,6 @@ func Delete(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Handle
 				writer.Write([]byte(fmt.Sprintf("Город с id %d не найден.\n", idInt)))
 				return
 			}
-			writer.WriteHeader(http.StatusBadRequest)
-			return
 		}()
 	}
 }

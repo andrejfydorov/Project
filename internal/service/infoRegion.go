@@ -40,7 +40,7 @@ func InfoRegion(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Ha
 			}
 
 			var cities []*repo.City
-			for _, city := range _repo.Cities {
+			for _, city := range _repo.GetAll() {
 				if strings.ToUpper(city.Region) == strings.ToUpper(r.Region) {
 					cities = append(cities, city)
 				}
@@ -62,6 +62,7 @@ func InfoRegion(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Ha
 				writer.Write([]byte(fmt.Sprintf("Города в регионе %s не найдены.\n", r.Region)))
 				return
 			}
+
 			writer.WriteHeader(http.StatusBadRequest)
 		}()
 	}

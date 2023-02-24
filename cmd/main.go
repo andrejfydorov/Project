@@ -20,7 +20,7 @@ func main() {
 	signal.Notify(done, os.Interrupt)
 
 	Repo = repo.New()
-	//defer repo.Close(&wg, &mutex, Repo)
+	defer repo.Close(&wg, &mutex, Repo)
 
 	service.Start(&wg, &mutex, Repo)
 

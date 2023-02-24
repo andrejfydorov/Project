@@ -40,7 +40,7 @@ func InfoFoundation(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) htt
 			}
 
 			var cities []*repo.City
-			for _, city := range _repo.Cities {
+			for _, city := range _repo.GetAll() {
 				if city.Population >= f.Start && city.Population <= f.Stop {
 					cities = append(cities, city)
 				}
