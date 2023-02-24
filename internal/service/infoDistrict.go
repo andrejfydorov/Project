@@ -8,52 +8,61 @@ import (
 	"log"
 	"net/http"
 	"strings"
+	"sync"
 )
 
-func (s *Service) InfoDistrict(writer http.ResponseWriter, request *http.Request) {
-	content, err := ioutil.ReadAll(request.Body)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte(err.Error()))
-		return
-	}
-	defer request.Body.Close()
+func InfoDistrict(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		go func() {
+			wg.Add(1)
+			defer wg.Done()
+			mutex.Lock()
+			defer mutex.Unlock()
 
-	type District struct {
-		District string `json:"district,omitempty"`
-	}
-	var d District
+			content, err := ioutil.ReadAll(request.Body)
+			if err != nil {
+				writer.WriteHeader(http.StatusInternalServerError)
+				writer.Write([]byte(err.Error()))
+				return
+			}
+			defer request.Body.Close()
 
-	if err := json.Unmarshal(content, &d); err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte(err.Error()))
-		fmt.Println(err)
-		return
-	}
+			type District struct {
+				District string `json:"district,omitempty"`
+			}
+			var d District
 
-	var cities []*repo.City
-	for _, city := range s.repo.Cities {
-		if strings.ToUpper(city.District) == strings.ToUpper(d.District) {
-			cities = append(cities, city)
-		}
-	}
+			if err := json.Unmarshal(content, &d); err != nil {
+				writer.WriteHeader(http.StatusInternalServerError)
+				writer.Write([]byte(err.Error()))
+				fmt.Println(err)
+				return
+			}
 
-	if len(cities) > 0 {
-		js, err := json.Marshal(cities)
-		if err != nil {
-			writer.WriteHeader(http.StatusInternalServerError)
-			writer.Write([]byte(err.Error()))
-			log.Fatalln(err)
-			return
-		}
-		writer.WriteHeader(http.StatusOK)
-		writer.Write(js)
-		return
-	} else {
-		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write([]byte(fmt.Sprintf("Города в округе %s не найдены.\n", d.District)))
-		return
+			var cities []*repo.City
+			for _, city := range _repo.Cities {
+				if strings.ToUpper(city.District) == strings.ToUpper(d.District) {
+					cities = append(cities, city)
+				}
+			}
+
+			if len(cities) > 0 {
+				js, err := json.Marshal(cities)
+				if err != nil {
+					writer.WriteHeader(http.StatusInternalServerError)
+					writer.Write([]byte(err.Error()))
+					log.Fatalln(err)
+					return
+				}
+				writer.WriteHeader(http.StatusOK)
+				writer.Write(js)
+				return
+			} else {
+				writer.WriteHeader(http.StatusBadRequest)
+				writer.Write([]byte(fmt.Sprintf("Города в округе %s не найдены.\n", d.District)))
+				return
+			}
+			writer.WriteHeader(http.StatusBadRequest)
+		}()
 	}
-	writer.WriteHeader(http.StatusBadRequest)
-	return
 }

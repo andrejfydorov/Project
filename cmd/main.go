@@ -3,41 +3,37 @@ package main
 import (
 	"Project/internal/repo"
 	"Project/internal/service"
-	"log"
+	"fmt"
 	"os"
 	"os/signal"
+	"sync"
 )
 
-var r repo.Repo
+var Repo *repo.Repo
 
 func main() {
 
+	var wg sync.WaitGroup
+	var mutex sync.Mutex
+
 	done := make(chan os.Signal, 1)
+	signal.Notify(done, os.Interrupt)
 
-	r, err := repo.New()
-	if err != nil {
-		log.Println(err)
-		return
-	}
-	//defer r.Close()
+	Repo = repo.New()
+	//defer repo.Close(&wg, &mutex, Repo)
 
-	err = service.New(r)
-	if err != nil {
-		log.Println(err)
-		return
-	}
+	service.Start(&wg, &mutex, Repo)
 
-	go func() {
-		for {
-			select {
-			case <-done:
-				r.Close()
-				return
-			default:
-				signal.Notify(done, os.Interrupt)
-			}
+	wg.Wait()
+
+	for {
+		select {
+		case <-done:
+			fmt.Println("Closing")
+			repo.Close(&wg, &mutex, Repo)
+			wg.Wait()
+			return
 		}
-
-	}()
+	}
 
 }

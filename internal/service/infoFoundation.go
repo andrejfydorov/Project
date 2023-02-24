@@ -7,54 +7,63 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"sync"
 )
 
-func (s *Service) InfoFoundation(writer http.ResponseWriter, request *http.Request) {
-	content, err := ioutil.ReadAll(request.Body)
-	if err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte(err.Error()))
-		return
-	}
-	defer request.Body.Close()
+func InfoFoundation(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.HandlerFunc {
+	return func(writer http.ResponseWriter, request *http.Request) {
+		go func() {
+			wg.Add(1)
+			defer wg.Done()
+			mutex.Lock()
+			defer mutex.Unlock()
 
-	type Foundation struct {
-		Start int `json:"start,omitempty"`
-		Stop  int `json:"stop,omitempty"`
-	}
-	f := Foundation{}
+			content, err := ioutil.ReadAll(request.Body)
+			if err != nil {
+				writer.WriteHeader(http.StatusInternalServerError)
+				writer.Write([]byte(err.Error()))
+				return
+			}
+			defer request.Body.Close()
 
-	if err := json.Unmarshal(content, &f); err != nil {
-		writer.WriteHeader(http.StatusInternalServerError)
-		writer.Write([]byte(err.Error()))
-		fmt.Println(err)
-		return
-	}
+			type Foundation struct {
+				Start int `json:"start,omitempty"`
+				Stop  int `json:"stop,omitempty"`
+			}
+			f := Foundation{}
 
-	var cities []*repo.City
-	for _, city := range s.repo.Cities {
-		if city.Population >= f.Start && city.Population <= f.Stop {
-			cities = append(cities, city)
-		}
-	}
+			if err := json.Unmarshal(content, &f); err != nil {
+				writer.WriteHeader(http.StatusInternalServerError)
+				writer.Write([]byte(err.Error()))
+				fmt.Println(err)
+				return
+			}
 
-	if len(cities) > 0 {
-		js, err := json.Marshal(cities)
-		if err != nil {
-			writer.WriteHeader(http.StatusInternalServerError)
-			writer.Write([]byte(err.Error()))
-			log.Fatalln(err)
-			return
-		}
-		writer.WriteHeader(http.StatusOK)
-		writer.Write(js)
-		return
-	} else {
-		writer.WriteHeader(http.StatusBadRequest)
-		writer.Write([]byte(fmt.Sprintf("Города в указанном диапазоне %d - %d не найдены.\n", f.Start, f.Stop)))
-		return
-	}
+			var cities []*repo.City
+			for _, city := range _repo.Cities {
+				if city.Population >= f.Start && city.Population <= f.Stop {
+					cities = append(cities, city)
+				}
+			}
 
-	writer.WriteHeader(http.StatusBadRequest)
-	return
+			if len(cities) > 0 {
+				js, err := json.Marshal(cities)
+				if err != nil {
+					writer.WriteHeader(http.StatusInternalServerError)
+					writer.Write([]byte(err.Error()))
+					log.Fatalln(err)
+					return
+				}
+				writer.WriteHeader(http.StatusOK)
+				writer.Write(js)
+				return
+			} else {
+				writer.WriteHeader(http.StatusBadRequest)
+				writer.Write([]byte(fmt.Sprintf("Города в указанном диапазоне %d - %d не найдены.\n", f.Start, f.Stop)))
+				return
+			}
+
+			writer.WriteHeader(http.StatusBadRequest)
+		}()
+	}
 }
