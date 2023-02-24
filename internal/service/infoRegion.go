@@ -23,6 +23,7 @@ func InfoRegion(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Ha
 			if err != nil {
 				writer.WriteHeader(http.StatusInternalServerError)
 				writer.Write([]byte(err.Error()))
+				log.Fatalln(err)
 				return
 			}
 			defer request.Body.Close()
@@ -35,7 +36,7 @@ func InfoRegion(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Ha
 			if err := json.Unmarshal(content, &r); err != nil {
 				writer.WriteHeader(http.StatusInternalServerError)
 				writer.Write([]byte(err.Error()))
-				fmt.Println(err)
+				log.Fatalln(err)
 				return
 			}
 
@@ -62,8 +63,6 @@ func InfoRegion(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Ha
 				writer.Write([]byte(fmt.Sprintf("Города в регионе %s не найдены.\n", r.Region)))
 				return
 			}
-
-			writer.WriteHeader(http.StatusBadRequest)
 		}()
 	}
 }

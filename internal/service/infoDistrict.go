@@ -23,19 +23,22 @@ func InfoDistrict(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.
 			if err != nil {
 				writer.WriteHeader(http.StatusInternalServerError)
 				writer.Write([]byte(err.Error()))
+				log.Fatalln(err)
 				return
 			}
+
 			defer request.Body.Close()
 
 			type District struct {
 				District string `json:"district,omitempty"`
 			}
+
 			var d District
 
 			if err := json.Unmarshal(content, &d); err != nil {
 				writer.WriteHeader(http.StatusInternalServerError)
 				writer.Write([]byte(err.Error()))
-				fmt.Println(err)
+				log.Fatalln(err)
 				return
 			}
 
@@ -62,8 +65,6 @@ func InfoDistrict(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.
 				writer.Write([]byte(fmt.Sprintf("Города в округе %s не найдены.\n", d.District)))
 				return
 			}
-
-			writer.WriteHeader(http.StatusBadRequest)
 		}()
 	}
 }

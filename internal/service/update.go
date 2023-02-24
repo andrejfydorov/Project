@@ -32,7 +32,7 @@ func Update(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Handle
 			fmt.Println(id + "\n")
 			idInt, err := strconv.Atoi(id)
 			if err != nil {
-				log.Fatalln(err)
+				log.Println(err)
 			}
 
 			city := _repo.Get(idInt)
@@ -45,7 +45,7 @@ func Update(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.Handle
 				if err := json.Unmarshal(content, &p); err != nil {
 					writer.WriteHeader(http.StatusInternalServerError)
 					writer.Write([]byte(err.Error()))
-					fmt.Println(err)
+					log.Fatalln(err)
 					return
 				}
 

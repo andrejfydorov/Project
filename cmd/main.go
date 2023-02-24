@@ -3,7 +3,7 @@ package main
 import (
 	"Project/internal/repo"
 	"Project/internal/service"
-	"fmt"
+	"log"
 	"os"
 	"os/signal"
 	"sync"
@@ -29,7 +29,7 @@ func main() {
 	for {
 		select {
 		case <-done:
-			fmt.Println("Closing")
+			log.Println("Closing")
 			repo.Close(&wg, &mutex, Repo)
 			wg.Wait()
 			return

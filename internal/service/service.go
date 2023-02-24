@@ -17,8 +17,8 @@ func Start(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) {
 
 	router.Get("/info/{id:[0-9]+}", Info(wg, mutex, _repo))
 	router.Post("/create", Create(wg, mutex, _repo))
-	router.Post("/delete/{id:[0-9]+}", Delete(wg, mutex, _repo))
-	router.Post("/update/{id:[0-9]+}", Update(wg, mutex, _repo))
+	router.Delete("/delete/{id:[0-9]+}", Delete(wg, mutex, _repo))
+	router.Put("/update/{id:[0-9]+}", Update(wg, mutex, _repo))
 	router.Post("/info/region", InfoRegion(wg, mutex, _repo))
 	router.Get("/info/district", InfoDistrict(wg, mutex, _repo))
 	router.Post("/info/population", InfoPopulation(wg, mutex, _repo))
@@ -27,7 +27,7 @@ func Start(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) {
 	go func() {
 		err := http.ListenAndServe(":8080", router)
 		if err != nil {
-			log.Println(err)
+			log.Fatalln(err)
 		}
 	}()
 

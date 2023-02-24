@@ -20,7 +20,7 @@ func Info(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) http.HandlerF
 			defer mutex.Unlock()
 
 			id := chi.URLParam(request, "id")
-			//fmt.Println(id + "\n")
+
 			idInt, err := strconv.Atoi(id)
 			if err != nil {
 				log.Fatalln(err)

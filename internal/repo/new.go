@@ -16,7 +16,7 @@ func New() *Repo {
 	file, err := os.Open("resources/cities.csv")
 	if err != nil {
 		log.Println("Unable to open file:", err)
-		log.Println(err)
+		log.Fatalln(err)
 	}
 	defer file.Close()
 
@@ -28,7 +28,7 @@ func New() *Repo {
 			if err == io.EOF {
 				break
 			} else {
-				log.Println(err)
+				log.Fatalln(err)
 			}
 		}
 
@@ -37,7 +37,7 @@ func New() *Repo {
 		var c City
 		key, err := strconv.Atoi(str[0])
 		if err != nil {
-			log.Println(err)
+			log.Fatalln(err)
 		}
 		c.Id = key
 		c.Name = str[1]
@@ -45,13 +45,13 @@ func New() *Repo {
 		c.District = str[3]
 		i, err := strconv.Atoi(str[4])
 		if err != nil {
-			log.Println(err)
+			log.Fatalln(err)
 		}
 		c.Population = i
 		str[5] = strings.Trim(str[5], "\r\n")
 		i, err = strconv.Atoi(str[5])
 		if err != nil {
-			log.Println(err)
+			log.Fatalln(err)
 		}
 		c.Foundation = i
 

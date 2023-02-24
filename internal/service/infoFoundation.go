@@ -22,6 +22,7 @@ func InfoFoundation(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) htt
 			if err != nil {
 				writer.WriteHeader(http.StatusInternalServerError)
 				writer.Write([]byte(err.Error()))
+				log.Fatalln(err)
 				return
 			}
 			defer request.Body.Close()
@@ -35,7 +36,7 @@ func InfoFoundation(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) htt
 			if err := json.Unmarshal(content, &f); err != nil {
 				writer.WriteHeader(http.StatusInternalServerError)
 				writer.Write([]byte(err.Error()))
-				fmt.Println(err)
+				log.Fatalln(err)
 				return
 			}
 
@@ -62,8 +63,6 @@ func InfoFoundation(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) htt
 				writer.Write([]byte(fmt.Sprintf("Города в указанном диапазоне %d - %d не найдены.\n", f.Start, f.Stop)))
 				return
 			}
-
-			writer.WriteHeader(http.StatusBadRequest)
 		}()
 	}
 }

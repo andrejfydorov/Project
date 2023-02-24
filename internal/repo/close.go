@@ -17,7 +17,9 @@ func Close(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *Repo) {
 	file, err := os.Create("resources/cities_.csv")
 	if err != nil {
 		log.Println("Unable to open file:", err)
+		log.Fatalln(err)
 	}
+
 	defer file.Close()
 
 	writer := bufio.NewWriter(file)
@@ -27,11 +29,11 @@ func Close(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *Repo) {
 
 		_, err := writer.WriteString(cityFull)
 		if err != nil {
-			log.Println(err)
+			log.Fatalln(err)
 		}
 		_, err = writer.WriteString("\n")
 		if err != nil {
-			log.Println(err)
+			log.Fatalln(err)
 		}
 
 	}
