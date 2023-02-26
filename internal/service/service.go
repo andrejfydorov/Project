@@ -6,23 +6,23 @@ import (
 	"github.com/go-chi/chi/v5/middleware"
 	"log"
 	"net/http"
-	"sync"
 )
 
-func Start(wg *sync.WaitGroup, mutex *sync.Mutex, _repo *repo.Repo) {
+func Start(r *repo.Repo) {
 
 	router := chi.NewRouter()
 
 	router.Use(middleware.Logger)
 
-	router.Get("/info/{id:[0-9]+}", Info(wg, mutex, _repo))
-	router.Post("/create", Create(wg, mutex, _repo))
-	router.Delete("/delete/{id:[0-9]+}", Delete(wg, mutex, _repo))
-	router.Put("/update/{id:[0-9]+}", Update(wg, mutex, _repo))
-	router.Post("/info/region", InfoRegion(wg, mutex, _repo))
-	router.Get("/info/district", InfoDistrict(wg, mutex, _repo))
-	router.Post("/info/population", InfoPopulation(wg, mutex, _repo))
-	router.Post("/info/foundation", InfoFoundation(wg, mutex, _repo))
+	router.Get("/cities/{id:[0-9]+}", Info(r))
+	router.Get("/cities", GetAll(r))
+	router.Post("/cities", Create(r))
+	router.Delete("/cities/{id:[0-9]+}", Delete(r))
+	router.Put("/cities/{id:[0-9]+}", Update(r))
+	router.Get("/cities/region", InfoRegion(r))
+	router.Get("/cities/district", InfoDistrict(r))
+	router.Get("/cities/population", InfoPopulation(r))
+	router.Get("/cities/foundation", InfoFoundation(r))
 
 	go func() {
 		err := http.ListenAndServe(":8080", router)

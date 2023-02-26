@@ -6,32 +6,23 @@ import (
 	"log"
 	"os"
 	"os/signal"
-	"sync"
 )
 
-var Repo *repo.Repo
-
 func main() {
-
-	var wg sync.WaitGroup
-	var mutex sync.Mutex
 
 	done := make(chan os.Signal, 1)
 	signal.Notify(done, os.Interrupt)
 
-	Repo = repo.New()
-	defer repo.Close(&wg, &mutex, Repo)
+	r := repo.New()
+	defer r.Close()
 
-	service.Start(&wg, &mutex, Repo)
-
-	wg.Wait()
+	service.Start(r)
 
 	for {
 		select {
 		case <-done:
 			log.Println("Closing")
-			repo.Close(&wg, &mutex, Repo)
-			wg.Wait()
+			r.Close()
 			return
 		}
 	}
